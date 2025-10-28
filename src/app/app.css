@@ -1,0 +1,403 @@
+/* Saubere und kontraststarke CSS Custom Properties */
+:root {
+  --primary-color: #2563eb;
+  --primary-hover: #1d4ed8;
+  --primary-light: #3b82f6;
+  
+  --secondary-color: #64748b;
+  --secondary-hover: #475569;
+  
+  --success-color: #059669;
+  --success-hover: #047857;
+  
+  --warning-color: #d97706;
+  --warning-hover: #b45309;
+  
+  --danger-color: #dc2626;
+  --danger-hover: #b91c1c;
+  
+  --bg-primary: #ffffff;
+  --bg-secondary: #f8fafc;
+  --bg-tertiary: #f1f5f9;
+  
+  --text-primary: #0f172a;
+  --text-secondary: #334155;
+  --text-muted: #64748b;
+  --text-light: #94a3b8;
+  
+  --border-color: #e2e8f0;
+  --border-hover: #cbd5e1;
+  
+  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+  
+  --radius-sm: 6px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+  
+  --transition: all 0.2s ease-in-out;
+}
+
+.app-container {
+  min-height: 100vh;
+  display: grid;
+  grid-template-rows: auto 1fr auto;
+  background: var(--bg-secondary);
+}
+
+/* Kompakter, moderner Header */
+.app-header {
+  background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+  color: white;
+  padding: 12px 0;
+  box-shadow: 0 2px 8px rgba(37, 99, 235, 0.15);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.header-content {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 24px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  position: relative;
+}
+
+.header-brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.app-icon {
+  font-size: 26px;
+  color: white;
+  filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.1));
+}
+
+.app-title {
+  margin: 0;
+  font-size: clamp(1.375rem, 3vw, 1.875rem);
+  font-weight: 600;
+  color: white;
+  letter-spacing: -0.025em;
+  line-height: 1;
+}
+
+.info-button {
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 6px;
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.info-button:hover {
+  background: rgba(255, 255, 255, 0.2);
+  border-color: rgba(255, 255, 255, 0.3);
+  transform: scale(1.05);
+}
+
+.info-button .material-icons {
+  font-size: 16px;
+  color: white;
+}
+
+/* Info Popup */
+.info-popup {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  visibility: hidden;
+  transition: all 0.3s ease;
+  z-index: 1000;
+}
+
+.info-popup.show {
+  opacity: 1;
+  visibility: visible;
+}
+
+.info-content {
+  background: white;
+  border-radius: 12px;
+  max-width: 500px;
+  width: 90%;
+  max-height: 80vh;
+  overflow-y: auto;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+  transform: translateY(20px);
+  transition: transform 0.3s ease;
+}
+
+.info-popup.show .info-content {
+  transform: translateY(0);
+}
+
+.info-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px 24px;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.info-header h3 {
+  margin: 0;
+  color: #1f2937;
+  font-size: 1.25rem;
+  font-weight: 600;
+}
+
+.close-button {
+  background: none;
+  border: none;
+  padding: 4px;
+  cursor: pointer;
+  border-radius: 6px;
+  transition: background-color 0.2s ease;
+}
+
+.close-button:hover {
+  background: #f3f4f6;
+}
+
+.close-button .material-icons {
+  font-size: 20px;
+  color: #6b7280;
+}
+
+.info-body {
+  padding: 20px 24px;
+}
+
+.info-step {
+  display: flex;
+  align-items: flex-start;
+  gap: 16px;
+  margin-bottom: 20px;
+}
+
+.info-step:last-child {
+  margin-bottom: 0;
+}
+
+.step-icon {
+  background: #eff6ff;
+  color: #2563eb;
+  border-radius: 50%;
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  flex-shrink: 0;
+}
+
+.info-step strong {
+  display: block;
+  color: #1f2937;
+  font-weight: 600;
+  margin-bottom: 4px;
+}
+
+.info-step p {
+  margin: 0;
+  color: #6b7280;
+  font-size: 0.875rem;
+  line-height: 1.4;
+}
+
+.app-subtitle {
+  display: none; /* Entfernt für kompakteres Design */
+}
+
+.app-main {
+  background: var(--bg-secondary);
+  padding: 24px;
+  min-height: 0;
+}
+
+/* Kompakter Footer */
+.app-footer {
+  background: var(--text-primary);
+  color: rgba(255, 255, 255, 0.8);
+  text-align: center;
+  padding: 12px 24px;
+  font-size: 13px;
+  font-weight: 400;
+  border-top: 1px solid var(--border-color);
+}
+
+.app-footer p {
+  margin: 0;
+}
+
+/* Responsive Design - Mobile First */
+@media (max-width: 768px) {
+  .app-header {
+    padding: 12px 0;
+  }
+  
+  .header-content {
+    padding: 0 16px;
+  }
+  
+  .header-brand {
+    gap: 8px;
+  }
+  
+  .app-icon {
+    font-size: 24px;
+  }
+  
+  .app-title {
+    font-size: clamp(1.25rem, 4vw, 1.75rem);
+  }
+  
+  .info-button {
+    width: 28px;
+    height: 28px;
+  }
+  
+  .info-button .material-icons {
+    font-size: 16px;
+  }
+  
+  .info-content {
+    width: 95%;
+    margin: 20px;
+  }
+  
+  .info-header {
+    padding: 16px 20px;
+  }
+  
+  .info-header h3 {
+    font-size: 1.125rem;
+  }
+  
+  .info-body {
+    padding: 16px 20px;
+  }
+  
+  .info-step {
+    gap: 12px;
+    margin-bottom: 16px;
+  }
+  
+  .step-icon {
+    width: 32px;
+    height: 32px;
+    font-size: 16px;
+  }
+  
+  .app-main {
+    padding: 16px;
+  }
+  
+  .app-footer {
+    padding: 16px;
+    font-size: 13px;
+  }
+}
+
+@media (max-width: 480px) {
+  .app-header {
+    padding: 10px 0;
+  }
+  
+  .header-content {
+    padding: 0 12px;
+  }
+  
+  .header-brand {
+    gap: 6px;
+  }
+  
+  .app-icon {
+    font-size: 22px;
+  }
+  
+  .app-title {
+    font-size: clamp(1.125rem, 5vw, 1.5rem);
+  }
+  
+  .info-button {
+    width: 26px;
+    height: 26px;
+  }
+  
+  .info-button .material-icons {
+    font-size: 15px;
+  }
+  
+  .info-content {
+    width: 98%;
+    margin: 10px;
+  }
+  
+  .info-header {
+    padding: 14px 16px;
+  }
+  
+  .info-body {
+    padding: 14px 16px;
+  }
+  
+  .app-main {
+    padding: 12px;
+  }
+  
+  .app-footer {
+    padding: 12px;
+    font-size: 12px;
+  }
+}
+
+/* Landscape orientation on mobile */
+@media (max-width: 768px) and (orientation: landscape) {
+  .app-header {
+    padding: 8px 0;
+  }
+  
+  .header-content {
+    gap: 8px;
+  }
+  
+  .app-icon {
+    font-size: 20px;
+  }
+  
+  .app-title {
+    font-size: clamp(1rem, 3vw, 1.5rem);
+  }
+  
+  .info-button {
+    width: 22px;
+    height: 22px;
+  }
+  
+  .info-button .material-icons {
+    font-size: 13px;
+  }
+  
+  .info-content {
+    max-height: 90vh;
+  }
+}

@@ -1,0 +1,24 @@
+<svg width="512" height="512" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background -->
+  <rect width="512" height="512" fill="#2563eb" rx="80"/>
+  
+  <!-- Icon Design - Dumbbell -->
+  <g transform="translate(256,256)">
+    <!-- Main bar -->
+    <rect x="-120" y="-12" width="240" height="24" fill="white" rx="12"/>
+    
+    <!-- Left weight -->
+    <circle cx="-120" cy="0" r="60" fill="white"/>
+    <circle cx="-120" cy="0" r="40" fill="#2563eb"/>
+    
+    <!-- Right weight -->
+    <circle cx="120" cy="0" r="60" fill="white"/>
+    <circle cx="120" cy="0" r="40" fill="#2563eb"/>
+    
+    <!-- Center grip -->
+    <rect x="-40" y="-16" width="80" height="32" fill="#64748b" rx="16"/>
+  </g>
+  
+  <!-- App name -->
+  <text x="256" y="420" text-anchor="middle" fill="white" font-family="Arial, sans-serif" font-size="36" font-weight="bold">FitTracker</text>
+</svg>

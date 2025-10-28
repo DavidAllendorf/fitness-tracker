@@ -1,0 +1,21 @@
+<svg width="16" height="16" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background -->
+  <rect width="16" height="16" fill="#2563eb" rx="2"/>
+  
+  <!-- Icon Design - Very simplified Dumbbell for 16x16 -->
+  <g transform="translate(8,8)">
+    <!-- Main bar -->
+    <rect x="-4" y="-0.5" width="8" height="1" fill="white"/>
+    
+    <!-- Left weight -->
+    <circle cx="-4" cy="0" r="2" fill="white"/>
+    <circle cx="-4" cy="0" r="1" fill="#2563eb"/>
+    
+    <!-- Right weight -->
+    <circle cx="4" cy="0" r="2" fill="white"/>
+    <circle cx="4" cy="0" r="1" fill="#2563eb"/>
+    
+    <!-- Center grip -->
+    <rect x="-1.5" y="-0.5" width="3" height="1" fill="#64748b"/>
+  </g>
+</svg>

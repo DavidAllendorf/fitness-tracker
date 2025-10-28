@@ -1,0 +1,128 @@
+<div class="workout-plans-container">
+  <header class="page-header">
+    <h1>Meine Trainingspläne</h1>
+    <div class="header-actions">
+      <button class="btn btn-primary" (click)="showCreatePlanForm()" [disabled]="showCreateForm()">
+        <span class="material-icons">add</span>
+        Neuer Plan
+      </button>
+      <div class="dropdown">
+        <button class="btn btn-secondary dropdown-toggle">
+          <span class="material-icons">more_vert</span>
+          Aktionen
+        </button>
+        <div class="dropdown-menu">
+          <label class="dropdown-item">
+            <input type="file" accept=".json" (change)="importPlans($event)" style="display: none;">
+            <span class="material-icons">upload</span> Importieren
+          </label>
+          <button class="dropdown-item" (click)="exportPlans()" [disabled]="workoutService.workoutPlans().length === 0">
+            <span class="material-icons">download</span> Exportieren
+          </button>
+          <hr>
+          <button class="dropdown-item danger" (click)="clearAllPlans()"
+            [disabled]="workoutService.workoutPlans().length === 0">
+            <span class="material-icons">delete_forever</span> Alle löschen
+          </button>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Formular für neuen Plan -->
+  @if (showCreateForm()) {
+  <div class="create-form-overlay">
+    <div class="create-form">
+      <div class="form-header">
+        <h2>Neuen Trainingsplan erstellen</h2>
+        <button class="btn-close" (click)="hideCreatePlanForm()">×</button>
+      </div>
+      <form (ngSubmit)="createPlan()" #createForm="ngForm">
+        <div class="form-group">
+          <label for="planName">Name des Trainingsplans *</label>
+          <input type="text" id="planName" [(ngModel)]="newPlanName" (ngModelChange)="newPlanName.set($event)"
+            name="planName" class="form-control" placeholder="z.B. Push/Pull/Legs" required maxlength="100">
+        </div>
+        <div class="form-group">
+          <label for="planDescription">Beschreibung (optional)</label>
+          <textarea id="planDescription" [(ngModel)]="newPlanDescription"
+            (ngModelChange)="newPlanDescription.set($event)" name="planDescription" class="form-control" rows="3"
+            placeholder="Beschreibung des Trainingsplans..." maxlength="500"></textarea>
+        </div>
+        <div class="form-group">
+          <label class="checkbox-label">
+            <input type="checkbox" [(ngModel)]="isActive" (ngModelChange)="isActive.set($event)" name="isActive">
+            <span class="checkmark"></span>
+            Plan ist aktiv
+          </label>
+        </div>
+        <div class="form-actions">
+          <button type="button" class="btn btn-secondary" (click)="hideCreatePlanForm()">
+            Abbrechen
+          </button>
+          <button type="submit" class="btn btn-primary" [disabled]="!newPlanName().trim()">
+            Plan erstellen
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+  }
+
+  <!-- Liste der Trainingspläne -->
+  <div class="plans-grid">
+    @if (workoutService.workoutPlans().length === 0) {
+    <div class="empty-state">
+      <div class="empty-icon">💪</div>
+      <h3>Noch keine Trainingspläne erstellt</h3>
+      <p>Erstellen Sie Ihren ersten Trainingsplan, um loszulegen!</p>
+      <button class="btn btn-primary" (click)="showCreatePlanForm()">
+        Ersten Plan erstellen
+      </button>
+    </div>
+    } @else {
+    @for (plan of workoutService.workoutPlans(); track plan.id) {
+    <div class="plan-card" [class.inactive]="!plan.isActive">
+      <div class="plan-header">
+        <div class="plan-title">
+          <h3>{{ plan.name }}</h3>
+          @if (!plan.isActive) {
+          <span class="status-badge inactive">Inaktiv</span>
+          }
+        </div>
+        <div class="plan-actions">
+          <button class="btn-icon" (click)="togglePlanStatus(plan.id)"
+            [title]="plan.isActive ? 'Deaktivieren' : 'Aktivieren'">
+            <span class="material-icons">{{ plan.isActive ? 'pause' : 'play_arrow' }}</span>
+          </button>
+          <button class="btn-icon danger" (click)="deletePlan(plan.id, plan.name)" title="Löschen">
+            <span class="material-icons">delete</span>
+          </button>
+        </div>
+      </div>
+
+      @if (plan.description) {
+      <p class="plan-description">{{ plan.description }}</p>
+      }
+
+      <div class="plan-stats">
+        <div class="stat">
+          <span class="stat-value">{{ plan.exercises.length }}</span>
+          <span class="stat-label">Übungen</span>
+        </div>
+        <div class="stat">
+          <span class="stat-value">{{ formatDate(plan.updatedAt) }}</span>
+          <span class="stat-label">Zuletzt bearbeitet</span>
+        </div>
+      </div>
+
+      <div class="plan-footer">
+        <button class="btn btn-primary btn-block" (click)="viewPlan(plan.id)">
+          Plan bearbeiten
+        </button>
+      </div>
+    </div>
+    }
+    }
+  </div>
+</div>
