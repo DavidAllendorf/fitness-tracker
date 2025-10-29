@@ -294,4 +294,11 @@ export class WorkoutPlanDetailComponent implements OnInit {
 
     this.workoutService.addExercise(planId, exerciseData);
   }
+
+  // Hilfsmethode um zu prüfen, ob der Exercise-Name wahrscheinlich nur eine Zeile benötigt
+  protected isExerciseNameSingleLine(exerciseName: string): boolean {
+    // Einfache Heuristik: Namen unter 25 Zeichen sind meist einzeilig
+    // Dies kann je nach Schriftgröße und Container-Breite angepasst werden
+    return exerciseName.length <= 25;
+  }
 }

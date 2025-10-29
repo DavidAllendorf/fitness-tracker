@@ -128,7 +128,7 @@
     <div class="exercises-list">
       @for (exercise of plan.exercises; track exercise.id; let i = $index) {
       <div class="exercise-card" [class.editing]="editingExercise()?.id === exercise.id">
-        <div class="exercise-header">
+        <div class="exercise-header" [class.single-line]="isExerciseNameSingleLine(exercise.name)">
           <div class="exercise-number">{{ i + 1 }}</div>
           <div class="exercise-title">
             <h3>{{ exercise.name }}</h3>
