@@ -28,15 +28,7 @@ export interface WorkoutPlan {
   updatedAt: Date;
 }
 
-// Modell für das Training selbst (für zukünftige Erweiterungen)
-export interface WorkoutSession {
-  id: string;
-  planId: string;
-  date: Date;
-  duration?: number; // in Minuten
-  notes?: string;
-  completed: boolean;
-}
+
 
 // Utility-Typen
 export type CreateSetDto = Omit<Set, 'id' | 'completed'>;
