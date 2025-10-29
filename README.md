@@ -2,6 +2,21 @@
 
 This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 20.3.7.
 
+## PWA Features
+
+This application is configured as a Progressive Web App (PWA) using Angular's official service worker implementation:
+
+- **Offline Support**: The app works offline with cached resources
+- **Automatic Updates**: Users are prompted when new app versions are available  
+- **Installable**: Can be installed on devices as a native app
+- **Background Sync**: Angular service worker handles caching strategies
+
+### PWA Configuration
+
+- `ngsw-config.json` - Service worker configuration
+- Angular Service Worker enabled in production builds only
+- App update notifications via `UpdateService`
+
 ## Development server
 
 To start a local development server, run:
@@ -11,6 +26,8 @@ ng serve
 ```
 
 Once the server is running, open your browser and navigate to `http://localhost:4200/`. The application will automatically reload whenever you modify any of the source files.
+
+**Note**: PWA features (service worker) are only active in production builds, not in development mode.
 
 ## Code scaffolding
 

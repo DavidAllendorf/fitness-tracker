@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router, ActivatedRoute } from '@angular/router';
 import { WorkoutService } from '../../services/workout.service';
-import { CreateExerciseDto, UpdateExerciseDto, Exercise, WorkoutPlan } from '../../models/workout.models';
+import { CreateExerciseDto, UpdateExerciseDto, Exercise, WorkoutPlan, Set, createEmptySet, createEmptySets } from '../../models/workout.models';
 
 @Component({
   selector: 'app-workout-plan-detail',
@@ -21,16 +21,12 @@ export class WorkoutPlanDetailComponent implements OnInit {
 
   // Form signals für neue Übung
   protected newExerciseName = signal('');
-  protected newExerciseSets = signal(3);
-  protected newExerciseReps = signal(10);
-  protected newExerciseWeight = signal(20);
   protected newExerciseRestTime = signal(60);
   protected newExerciseNotes = signal('');
 
   // Form signals für Plan bearbeiten
   protected editPlanName = signal('');
   protected editPlanDescription = signal('');
-  protected editPlanIsActive = signal(true);
 
   // Computed properties
   protected currentPlan = computed(() => {
@@ -85,9 +81,6 @@ export class WorkoutPlanDetailComponent implements OnInit {
    */
   private resetExerciseForm(): void {
     this.newExerciseName.set('');
-    this.newExerciseSets.set(3);
-    this.newExerciseReps.set(10);
-    this.newExerciseWeight.set(20);
     this.newExerciseRestTime.set(60);
     this.newExerciseNotes.set('');
   }
@@ -99,11 +92,12 @@ export class WorkoutPlanDetailComponent implements OnInit {
     const planId = this.planId();
     if (!planId || !this.newExerciseName().trim()) return;
 
+    // Erstelle standardmäßig nur 1 leeren Satz
+    const sets: Set[] = [createEmptySet()];
+
     const exerciseData: CreateExerciseDto = {
       name: this.newExerciseName().trim(),
-      sets: this.newExerciseSets(),
-      reps: this.newExerciseReps(),
-      weight: this.newExerciseWeight(),
+      sets: sets,
       restTime: this.newExerciseRestTime() || undefined,
       notes: this.newExerciseNotes().trim() || undefined
     };
@@ -121,9 +115,6 @@ export class WorkoutPlanDetailComponent implements OnInit {
     this.editingExercise.set(exercise);
     // Formular mit aktuellen Werten füllen
     this.newExerciseName.set(exercise.name);
-    this.newExerciseSets.set(exercise.sets);
-    this.newExerciseReps.set(exercise.reps);
-    this.newExerciseWeight.set(exercise.weight);
     this.newExerciseRestTime.set(exercise.restTime || 60);
     this.newExerciseNotes.set(exercise.notes || '');
   }
@@ -144,11 +135,9 @@ export class WorkoutPlanDetailComponent implements OnInit {
     const exercise = this.editingExercise();
     if (!planId || !exercise || !this.newExerciseName().trim()) return;
 
+    // Bestehende Sätze beibehalten
     const updates: UpdateExerciseDto = {
       name: this.newExerciseName().trim(),
-      sets: this.newExerciseSets(),
-      reps: this.newExerciseReps(),
-      weight: this.newExerciseWeight(),
       restTime: this.newExerciseRestTime() || undefined,
       notes: this.newExerciseNotes().trim() || undefined
     };
@@ -180,7 +169,6 @@ export class WorkoutPlanDetailComponent implements OnInit {
 
     this.editPlanName.set(plan.name);
     this.editPlanDescription.set(plan.description || '');
-    this.editPlanIsActive.set(plan.isActive);
     this.showEditPlanForm.set(true);
   }
 
@@ -200,8 +188,7 @@ export class WorkoutPlanDetailComponent implements OnInit {
 
     const updates = {
       name: this.editPlanName().trim(),
-      description: this.editPlanDescription().trim() || undefined,
-      isActive: this.editPlanIsActive()
+      description: this.editPlanDescription().trim() || undefined
     };
 
     const updatedPlan = await this.workoutService.updateWorkoutPlan(planId, updates);
@@ -235,19 +222,51 @@ export class WorkoutPlanDetailComponent implements OnInit {
   }
 
   /**
-   * Berechnet das Gesamtvolumen einer Übung
+   * Aktualisiert einen einzelnen Satz
    */
-  calculateVolume(exercise: Exercise): number {
-    return exercise.sets * exercise.reps * exercise.weight;
+  updateSet(exercise: Exercise, setId: string, field: 'reps' | 'weight', value: number): void {
+    const planId = this.planId();
+    if (!planId) return;
+
+    const updatedSets = exercise.sets.map(set =>
+      set.id === setId ? { ...set, [field]: value } : set
+    );
+
+    const updates: UpdateExerciseDto = { sets: updatedSets };
+    this.workoutService.updateExercise(planId, exercise.id, updates);
   }
 
   /**
-   * Berechnet das Gesamtvolumen des Plans
+   * Fügt einen neuen Satz zu einer Übung hinzu
    */
-  calculateTotalVolume(): number {
-    const plan = this.currentPlan();
-    if (!plan) return 0;
-    return plan.exercises.reduce((total, exercise) => total + this.calculateVolume(exercise), 0);
+  addSet(exercise: Exercise): void {
+    const planId = this.planId();
+    if (!planId) return;
+
+    // Standard-Werte basierend auf dem letzten Satz oder Defaults
+    const lastSet = exercise.sets[exercise.sets.length - 1];
+    const newSet = createEmptySet(
+      lastSet?.reps || 10,
+      lastSet?.weight || 20
+    );
+
+    const updatedSets = [...exercise.sets, newSet];
+    const updates: UpdateExerciseDto = { sets: updatedSets };
+
+    this.workoutService.updateExercise(planId, exercise.id, updates);
+  }
+
+  /**
+   * Entfernt den letzten Satz einer Übung
+   */
+  removeLastSet(exercise: Exercise): void {
+    const planId = this.planId();
+    if (!planId || exercise.sets.length <= 1) return;
+
+    const updatedSets = exercise.sets.slice(0, -1); // Entferne letzten Satz
+    const updates: UpdateExerciseDto = { sets: updatedSets };
+
+    this.workoutService.updateExercise(planId, exercise.id, updates);
   }
 
   /**
@@ -257,11 +276,18 @@ export class WorkoutPlanDetailComponent implements OnInit {
     const planId = this.planId();
     if (!planId) return;
 
+    // Sätze kopieren
+    const copiedSets: Set[] = exercise.sets.map(set => ({
+      id: crypto.randomUUID(),
+      reps: set.reps,
+      weight: set.weight,
+      completed: false,
+      notes: set.notes
+    }));
+
     const exerciseData: CreateExerciseDto = {
       name: `${exercise.name} (Kopie)`,
-      sets: exercise.sets,
-      reps: exercise.reps,
-      weight: exercise.weight,
+      sets: copiedSets,
       restTime: exercise.restTime,
       notes: exercise.notes
     };

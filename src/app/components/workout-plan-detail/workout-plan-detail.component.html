@@ -9,9 +9,15 @@
       </button>
       <div class="plan-title">
         <h1>{{ plan.name }}</h1>
-        @if (!plan.isActive) {
-        <span class="status-badge inactive">Inaktiv</span>
-        }
+      </div>
+      <div class="header-actions-mobile">
+        <button class="btn-icon" (click)="showEditPlan()" title="Plan bearbeiten">
+          <span class="material-icons">edit</span>
+        </button>
+        <button class="btn-icon btn-primary-icon" (click)="showCreateExercise()"
+          [disabled]="showCreateExerciseForm() || editingExercise()" title="Übung hinzufügen">
+          <span class="material-icons">add</span>
+        </button>
       </div>
     </div>
     <div class="header-actions">
@@ -26,27 +32,6 @@
       </button>
     </div>
   </header>
-
-  <!-- Plan Info -->
-  <div class="plan-info">
-    @if (plan.description) {
-    <p class="plan-description">{{ plan.description }}</p>
-    }
-    <div class="plan-stats">
-      <div class="stat">
-        <span class="stat-value">{{ plan.exercises.length }}</span>
-        <span class="stat-label">Übungen</span>
-      </div>
-      <div class="stat">
-        <span class="stat-value">{{ calculateTotalVolume() }}</span>
-        <span class="stat-label">Gesamtvolumen (kg)</span>
-      </div>
-      <div class="stat">
-        <span class="stat-value">{{ formatDate(plan.updatedAt) }}</span>
-        <span class="stat-label">Zuletzt bearbeitet</span>
-      </div>
-    </div>
-  </div>
 
   <!-- Plan Edit Form -->
   @if (showEditPlanForm()) {
@@ -68,14 +53,6 @@
             <textarea id="editPlanDescription" [(ngModel)]="editPlanDescription"
               (ngModelChange)="editPlanDescription.set($event)" name="editPlanDescription" class="form-control" rows="3"
               maxlength="500"></textarea>
-          </div>
-          <div class="form-group">
-            <label class="checkbox-label">
-              <input type="checkbox" [(ngModel)]="editPlanIsActive" (ngModelChange)="editPlanIsActive.set($event)"
-                name="editPlanIsActive">
-              <span class="checkmark"></span>
-              Plan ist aktiv
-            </label>
           </div>
         </div>
         <div class="form-actions">
@@ -107,31 +84,11 @@
               (ngModelChange)="newExerciseName.set($event)" name="exerciseName" class="form-control"
               placeholder="z.B. Bankdrücken" required maxlength="100">
           </div>
-          <div class="form-row">
-            <div class="form-group">
-              <label for="exerciseSets">Sätze</label>
-              <input type="number" id="exerciseSets" [(ngModel)]="newExerciseSets"
-                (ngModelChange)="newExerciseSets.set($event)" name="exerciseSets" class="form-control" min="1" max="50"
-                required>
-            </div>
-            <div class="form-group">
-              <label for="exerciseReps">Wiederholungen</label>
-              <input type="number" id="exerciseReps" [(ngModel)]="newExerciseReps"
-                (ngModelChange)="newExerciseReps.set($event)" name="exerciseReps" class="form-control" min="1" max="100"
-                required>
-            </div>
-            <div class="form-group">
-              <label for="exerciseWeight">Gewicht (kg)</label>
-              <input type="number" id="exerciseWeight" [(ngModel)]="newExerciseWeight"
-                (ngModelChange)="newExerciseWeight.set($event)" name="exerciseWeight" class="form-control" min="0"
-                step="0.5" required>
-            </div>
-            <div class="form-group">
-              <label for="exerciseRestTime">Pause (Sekunden)</label>
-              <input type="number" id="exerciseRestTime" [(ngModel)]="newExerciseRestTime"
-                (ngModelChange)="newExerciseRestTime.set($event)" name="exerciseRestTime" class="form-control" min="0"
-                max="600">
-            </div>
+          <div class="form-group">
+            <label for="exerciseRestTime">Pause (Sekunden)</label>
+            <input type="number" id="exerciseRestTime" [(ngModel)]="newExerciseRestTime"
+              (ngModelChange)="newExerciseRestTime.set($event)" name="exerciseRestTime" class="form-control" min="0"
+              max="600">
           </div>
           <div class="form-group">
             <label for="exerciseNotes">Notizen (optional)</label>
@@ -175,45 +132,57 @@
           <div class="exercise-number">{{ i + 1 }}</div>
           <div class="exercise-title">
             <h3>{{ exercise.name }}</h3>
-            @if (exercise.notes) {
-            <p class="exercise-notes">{{ exercise.notes }}</p>
-            }
           </div>
           <div class="exercise-actions">
-            <button class="btn-icon" (click)="duplicateExercise(exercise)" title="Duplizieren">
+            <button class="btn-action" (click)="duplicateExercise(exercise)" title="Duplizieren">
               <span class="material-icons">content_copy</span>
             </button>
-            <button class="btn-icon" (click)="startEditExercise(exercise)" title="Bearbeiten"
+            <button class="btn-action" (click)="startEditExercise(exercise)" title="Bearbeiten"
               [disabled]="editingExercise() !== null">
               <span class="material-icons">edit</span>
             </button>
-            <button class="btn-icon danger" (click)="deleteExercise(exercise.id, exercise.name)" title="Löschen">
+            <button class="btn-action danger" (click)="deleteExercise(exercise.id, exercise.name)" title="Löschen">
               <span class="material-icons">delete</span>
             </button>
           </div>
         </div>
 
+        @if (exercise.notes) {
+        <div class="exercise-notes-section">
+          <p class="exercise-notes">{{ exercise.notes }}</p>
+        </div>
+        }
+
         <div class="exercise-details">
-          <div class="exercise-params">
-            <div class="param">
-              <span class="param-value">{{ exercise.sets }}</span>
-              <span class="param-label">Sätze</span>
-            </div>
-            <div class="param">
-              <span class="param-value">{{ exercise.reps }}</span>
-              <span class="param-label">Wdh.</span>
-            </div>
-            <div class="param">
-              <span class="param-value">{{ exercise.weight }}</span>
-              <span class="param-label">kg</span>
-            </div>
-            <div class="param">
-              <span class="param-value">{{ formatRestTime(exercise.restTime) }}</span>
-              <span class="param-label">Pause</span>
-            </div>
-            <div class="param volume">
-              <span class="param-value">{{ calculateVolume(exercise) }}</span>
-              <span class="param-label">Volumen (kg)</span>
+          <!-- Dynamische Sätze-Ansicht -->
+          <div class="sets-simple">
+            <div class="sets-grid">
+              @for (set of exercise.sets; track set.id; let setIndex = $index; let isLast = $last) {
+              <div class="set-row">
+                @if (exercise.sets.length > 1 && isLast) {
+                <button class="btn-action" (click)="removeLastSet(exercise)" title="Letzten Satz entfernen">
+                  <span class="material-icons">remove</span>
+                </button>
+                }
+
+                <div class="set-inputs-center">
+                  <input type="number" [(ngModel)]="set.reps"
+                    (ngModelChange)="updateSet(exercise, set.id, 'reps', $event)" class="set-input-simple"
+                    placeholder="Wdh" min="1" max="100">
+                  x
+                  <input type="number" [(ngModel)]="set.weight"
+                    (ngModelChange)="updateSet(exercise, set.id, 'weight', $event)" class="set-input-simple"
+                    placeholder="kg" min="0" step="0.5">
+                  <span class="set-unit">kg</span>
+                </div>
+
+                @if (isLast) {
+                <button class="btn-action" (click)="addSet(exercise)" title="Satz hinzufügen">
+                  <span class="material-icons">add</span>
+                </button>
+                }
+              </div>
+              }
             </div>
           </div>
         </div>

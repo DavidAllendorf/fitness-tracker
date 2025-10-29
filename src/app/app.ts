@@ -1,6 +1,7 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
 import { CommonModule } from '@angular/common';
+import { UpdateService } from './services/update.service';
 
 @Component({
   selector: 'app-root',
@@ -10,4 +11,5 @@ import { CommonModule } from '@angular/common';
 })
 export class App {
   showInfo = false;
+  private updateService = inject(UpdateService);
 }

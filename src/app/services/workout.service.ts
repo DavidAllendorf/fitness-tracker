@@ -7,7 +7,8 @@ import {
   CreateWorkoutPlanDto,
   UpdateWorkoutPlanDto,
   CreateExerciseDto,
-  UpdateExerciseDto
+  UpdateExerciseDto,
+  migrateOldExerciseToNew
 } from '../models/workout.models';
 
 @Injectable({
@@ -79,18 +80,25 @@ export class WorkoutService {
   private loadWorkoutPlans(): void {
     const plans = this.localStorageService.getItem<WorkoutPlan[]>(this.WORKOUT_PLANS_KEY);
     if (plans) {
-      // Konvertiere Date-Strings zurück zu Date-Objekten
+      // Konvertiere Date-Strings zurück zu Date-Objekten und migriere alte Übungen
       const parsedPlans = plans.map(plan => ({
         ...plan,
         createdAt: new Date(plan.createdAt),
         updatedAt: new Date(plan.updatedAt),
-        exercises: plan.exercises.map(exercise => ({
-          ...exercise,
-          createdAt: new Date(exercise.createdAt),
-          updatedAt: new Date(exercise.updatedAt)
-        }))
+        exercises: plan.exercises.map(exercise => {
+          const migratedExercise = migrateOldExerciseToNew({
+            ...exercise,
+            createdAt: new Date(exercise.createdAt),
+            updatedAt: new Date(exercise.updatedAt)
+          });
+          return migratedExercise;
+        })
       }));
+
       this._workoutPlans.set(parsedPlans);
+
+      // Speichere die migrierten Daten zurück
+      this.saveWorkoutPlans();
     }
   }
 

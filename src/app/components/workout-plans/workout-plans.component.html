@@ -2,14 +2,13 @@
   <header class="page-header">
     <h1>Meine Trainingspläne</h1>
     <div class="header-actions">
-      <button class="btn btn-primary" (click)="showCreatePlanForm()" [disabled]="showCreateForm()">
+      <button class="btn btn-primary btn-icon" (click)="showCreatePlanForm()" [disabled]="showCreateForm()"
+        title="Neuer Plan">
         <span class="material-icons">add</span>
-        Neuer Plan
       </button>
       <div class="dropdown">
-        <button class="btn btn-secondary dropdown-toggle">
+        <button class="btn btn-secondary dropdown-toggle btn-icon" title="Aktionen">
           <span class="material-icons">more_vert</span>
-          Aktionen
         </button>
         <div class="dropdown-menu">
           <label class="dropdown-item">
@@ -49,13 +48,6 @@
             (ngModelChange)="newPlanDescription.set($event)" name="planDescription" class="form-control" rows="3"
             placeholder="Beschreibung des Trainingsplans..." maxlength="500"></textarea>
         </div>
-        <div class="form-group">
-          <label class="checkbox-label">
-            <input type="checkbox" [(ngModel)]="isActive" (ngModelChange)="isActive.set($event)" name="isActive">
-            <span class="checkmark"></span>
-            Plan ist aktiv
-          </label>
-        </div>
         <div class="form-actions">
           <button type="button" class="btn btn-secondary" (click)="hideCreatePlanForm()">
             Abbrechen
@@ -82,20 +74,14 @@
     </div>
     } @else {
     @for (plan of workoutService.workoutPlans(); track plan.id) {
-    <div class="plan-card" [class.inactive]="!plan.isActive">
+    <div class="plan-card" (click)="viewPlan(plan.id)">
       <div class="plan-header">
         <div class="plan-title">
           <h3>{{ plan.name }}</h3>
-          @if (!plan.isActive) {
-          <span class="status-badge inactive">Inaktiv</span>
-          }
         </div>
         <div class="plan-actions">
-          <button class="btn-icon" (click)="togglePlanStatus(plan.id)"
-            [title]="plan.isActive ? 'Deaktivieren' : 'Aktivieren'">
-            <span class="material-icons">{{ plan.isActive ? 'pause' : 'play_arrow' }}</span>
-          </button>
-          <button class="btn-icon danger" (click)="deletePlan(plan.id, plan.name)" title="Löschen">
+          <button class="btn-icon danger" (click)="deletePlan(plan.id, plan.name); $event.stopPropagation()"
+            title="Löschen">
             <span class="material-icons">delete</span>
           </button>
         </div>
@@ -111,15 +97,13 @@
           <span class="stat-label">Übungen</span>
         </div>
         <div class="stat">
-          <span class="stat-value">{{ formatDate(plan.updatedAt) }}</span>
-          <span class="stat-label">Zuletzt bearbeitet</span>
+          <span class="stat-value">{{ calculatePlanDuration(plan) }}</span>
+          <span class="stat-label">Geschätzte Dauer</span>
         </div>
       </div>
 
       <div class="plan-footer">
-        <button class="btn btn-primary btn-block" (click)="viewPlan(plan.id)">
-          Plan bearbeiten
-        </button>
+        <span class="last-edited">Zuletzt bearbeitet: {{ formatDate(plan.updatedAt) }}</span>
       </div>
     </div>
     }

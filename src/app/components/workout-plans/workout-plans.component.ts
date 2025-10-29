@@ -17,7 +17,6 @@ export class WorkoutPlansComponent {
   protected showCreateForm = signal(false);
   protected newPlanName = signal('');
   protected newPlanDescription = signal('');
-  protected isActive = signal(true);
 
   constructor(
     protected workoutService: WorkoutService,
@@ -46,7 +45,6 @@ export class WorkoutPlansComponent {
   private resetForm(): void {
     this.newPlanName.set('');
     this.newPlanDescription.set('');
-    this.isActive.set(true);
   }
 
   /**
@@ -58,8 +56,7 @@ export class WorkoutPlansComponent {
 
     const planData: CreateWorkoutPlanDto = {
       name,
-      description: this.newPlanDescription().trim() || undefined,
-      isActive: this.isActive()
+      description: this.newPlanDescription().trim() || undefined
     };
 
     const newPlan = await this.workoutService.createWorkoutPlan(planData);
@@ -88,16 +85,6 @@ export class WorkoutPlansComponent {
   }
 
   /**
-   * Schaltet den aktiven Status eines Plans um
-   */
-  togglePlanStatus(planId: string): void {
-    const plan = this.workoutService.workoutPlans().find(p => p.id === planId);
-    if (plan) {
-      this.workoutService.updateWorkoutPlan(planId, { isActive: !plan.isActive });
-    }
-  }
-
-  /**
    * Formatiert ein Datum für die Anzeige
    */
   formatDate(date: Date): string {
@@ -106,6 +93,35 @@ export class WorkoutPlansComponent {
       month: '2-digit',
       day: '2-digit'
     });
+  }
+
+  /**
+   * Berechnet die geschätzte Dauer eines Trainingsplans
+   * Basierend auf: Anzahl Sätze (je 1 Min) + Pausenzeiten zwischen Sätzen
+   */
+  calculatePlanDuration(plan: any): string {
+    let totalMinutes = 0;
+
+    for (const exercise of plan.exercises) {
+      // Anzahl der Sätze (jeder Satz = 1 Minute)
+      const setsCount = exercise.sets ? exercise.sets.length : 0;
+      totalMinutes += setsCount;
+
+      // Pausenzeiten zwischen den Sätzen (nur zwischen Sätzen, nicht nach dem letzten)
+      if (setsCount > 1) {
+        const restTimeMinutes = exercise.restTime ? (exercise.restTime / 60) : 1; // Default 1 Min Pause
+        totalMinutes += (setsCount - 1) * restTimeMinutes;
+      }
+    }
+
+    // Formatierung der Ausgabe
+    if (totalMinutes >= 60) {
+      const hours = Math.floor(totalMinutes / 60);
+      const minutes = Math.round(totalMinutes % 60);
+      return minutes > 0 ? `${hours}h ${minutes}min` : `${hours}h`;
+    } else {
+      return `${Math.round(totalMinutes)}min`;
+    }
   }
 
   /**
